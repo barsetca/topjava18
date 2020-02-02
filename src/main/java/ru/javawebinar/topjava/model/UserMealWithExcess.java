@@ -1,7 +1,6 @@
 package ru.javawebinar.topjava.model;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 public class UserMealWithExcess {
     private final LocalDateTime dateTime;
@@ -13,7 +12,6 @@ public class UserMealWithExcess {
     private final boolean excess;
 
     public UserMealWithExcess(LocalDateTime dateTime, String description, int calories, boolean excess) {
-        Objects.requireNonNull(dateTime, "dateTime must not be null");
         this.dateTime = dateTime;
         this.description = description;
         this.calories = calories;
