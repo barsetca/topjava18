@@ -6,8 +6,6 @@ import java.util.List;
 
 public interface Storage {
 
-    void clear();
-
     void update(Meal meal);
 
     void save(Meal meal);
@@ -18,6 +16,5 @@ public interface Storage {
 
     List<Meal> getListAll();
 
-    int size();
 }
 

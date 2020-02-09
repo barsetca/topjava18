@@ -13,7 +13,6 @@
 <section>
     <form method="post" action="meals" enctype="application/x-www-form-urlencoded">
         <input type="hidden" name="id" value="${meal.id}">
-        <input type="hidden" name="action" value="<%=request.getParameter("action")%>">
 
         <h3>Дата и время приема пищи:</h3>
         <dl>
@@ -27,7 +26,7 @@
         </dl>
         <h3>Количество колорий:</h3>
         <dl>
-            <input type="number" required name="calories" size=50 value="${meal.calories}"
+            <input type="number" required name="calories" min="0" size=50 value="${meal.calories}"
                    placeholder="Целое число">
         </dl>
         <hr>

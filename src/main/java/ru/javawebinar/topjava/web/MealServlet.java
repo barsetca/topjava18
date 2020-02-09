@@ -7,6 +7,7 @@ import ru.javawebinar.topjava.storage.MapStorageMeal;
 import ru.javawebinar.topjava.storage.Storage;
 import ru.javawebinar.topjava.util.TimeUtil;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +24,13 @@ import static ru.javawebinar.topjava.util.MealsUtil.getFiltered;
 public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
 
-    private Storage storageMeal = new MapStorageMeal();
+    private Storage storageMeal;
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        storageMeal = new MapStorageMeal();
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -33,16 +40,13 @@ public class MealServlet extends HttpServlet {
         LocalDateTime localDateTime = TimeUtil.stringToLocalDateTime(request.getParameter("dateTime"));
         int calories = Integer.parseInt(request.getParameter("calories"));
         String description = request.getParameter("description");
-        String action = request.getParameter("action");
-        Meal meal;
-        if (action.equals("add")) {
-            meal = new Meal(localDateTime, description, calories);
+
+        Meal meal = new Meal(localDateTime, description, calories);
+
+        if (id == 0) {
             storageMeal.save(meal);
         } else {
-            meal = storageMeal.get(id);
-            meal.setDateTime(localDateTime);
-            meal.setDescription(description);
-            meal.setCalories(calories);
+            meal.setId(Integer.parseInt(request.getParameter("id")));
             storageMeal.update(meal);
         }
         response.sendRedirect("meals");
@@ -62,24 +66,22 @@ public class MealServlet extends HttpServlet {
             return;
         }
         String stringId = request.getParameter("id");
-        int id = 0;
-        if (stringId != null) {
-            id = Integer.parseInt(stringId);
-        }
+
         Meal meal;
         switch (action) {
             case "delete":
-                storageMeal.delete(id);
+                storageMeal.delete(Integer.parseInt(stringId));
                 response.sendRedirect("meals");
                 return;
             case "edit":
-                meal = storageMeal.get(id);
+                meal = storageMeal.get(Integer.parseInt(stringId));
                 break;
             case "add":
                 meal = new Meal(TimeUtil.NOW_WITHOUT_SECOND_NANO, "", 0);
                 break;
             default:
-                throw new IllegalArgumentException("Action " + action + " is illegal");
+                response.sendRedirect("meals");
+                return;
         }
         request.setAttribute("meal", meal);
         request.getRequestDispatcher("/editMeal.jsp").forward(request, response);
