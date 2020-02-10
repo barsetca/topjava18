@@ -14,7 +14,7 @@ public class MapStorageMeal implements Storage {
 
     protected ConcurrentMap<Integer, Meal> storage = new ConcurrentHashMap<>();
 
-    private static AtomicInteger id = new AtomicInteger(0);
+    private AtomicInteger countId = new AtomicInteger(0);
 
     {
         save(new Meal(LocalDateTime.of(2015, Month.MAY, 30, 10, 0), "Завтрак", 500));
@@ -32,8 +32,7 @@ public class MapStorageMeal implements Storage {
 
     @Override
     public void save(Meal meal) {
-        id.incrementAndGet();
-        meal.setId(id.get());
+        meal.setId(countId.incrementAndGet());
         storage.putIfAbsent(meal.getId(), meal);
     }
 
