@@ -31,6 +31,7 @@
     <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.Meal" scope="request"/>
     <form method="post" action="meals">
         <input type="hidden" name="id" value="${meal.id}">
+        <input type="hidden" name="action" value="<%=request.getParameter("action")%>">
         <dl>
             <dt>DateTime:</dt>
             <dd><input type="datetime-local" value="${meal.dateTime}" name="dateTime" required></dd>
@@ -43,6 +44,7 @@
             <dt>Calories:</dt>
             <dd><input type="number" value="${meal.calories}" name="calories" required></dd>
         </dl>
+
         <button type="submit">Save</button>
         <button onclick="window.history.back()" type="button">Cancel</button>
     </form>
