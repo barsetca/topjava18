@@ -27,13 +27,13 @@
 
         <div style="display:inline-block">
             DateFrom:
-            <input type="date" value="${null}" name="dateFrom">
+            <input type="date" name="dateFrom">
             DateTo:
-            <input type="date" value="${null}" name="dateTo">
+            <input type="date" name="dateTo">
             TimeFrom:
-            <input type="time" value="${null}" name="timeFrom">
+            <input type="time" name="timeFrom">
             TimeTo:
-            <input type="time" value="${null}" name="timeTo">
+            <input type="time" name="timeTo">
         </div>
         <br/><br/>
         <button type="submit">doFilter</button>

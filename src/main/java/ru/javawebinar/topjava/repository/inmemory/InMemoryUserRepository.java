@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -20,6 +21,7 @@ public class InMemoryUserRepository implements UserRepository {
     private static final Logger log = LoggerFactory.getLogger(InMemoryUserRepository.class);
 
     private Map<Integer, User> repository = new ConcurrentHashMap<>();
+    private AtomicInteger counter = new AtomicInteger(0);
 
     {
         for (User USER : UsersUtil.USERS) {
@@ -36,14 +38,12 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public User save(User user) {
         log.info("save {}", user);
-        if (user == null) {
-            return null;
+        if (user.isNew()) {
+            Integer newId = counter.incrementAndGet();
+            user.setId(newId);
         }
-        User updateUser = repository.computeIfPresent(user.getId(), (id, oldUser) -> user);
-        if (updateUser == null) {
-            return repository.computeIfAbsent(user.getId(), v -> user);
-        }
-        return updateUser;
+        repository.put(user.getId(), user);
+        return user;
     }
 
     @Override
@@ -66,13 +66,6 @@ public class InMemoryUserRepository implements UserRepository {
         if (email == null) {
             return null;
         }
-        User userFind = null;
-        for (User user : repository.values()) {
-            if (email.equals(user.getEmail())) {
-                userFind = user;
-                break;
-            }
-        }
-        return userFind;
+        return repository.values().stream().filter(user -> email.equals(user.getEmail())).findAny().orElse(null);
     }
 }

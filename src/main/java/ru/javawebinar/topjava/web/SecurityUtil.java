@@ -8,13 +8,13 @@ public class SecurityUtil {
 
     public static int authUserId() {
         if ("".equals(userId) || userId == null) {
-            userId = "0";
+            userId = "1";
         }
         return Integer.parseInt(userId);
     }
 
     public void setUserId(String userId) {
-        this.userId = userId;
+        SecurityUtil.userId = userId;
     }
 
     public static int authUserCaloriesPerDay() {

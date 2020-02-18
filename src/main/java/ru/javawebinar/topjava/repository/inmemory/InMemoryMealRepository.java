@@ -12,6 +12,8 @@ import ru.javawebinar.topjava.web.SecurityUtil;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,73 +24,62 @@ import java.util.stream.Collectors;
 public class InMemoryMealRepository implements MealRepository {
     private static final Logger log = LoggerFactory.getLogger(InMemoryMealRepository.class);
 
-    private Map<Integer, Meal> repository = new ConcurrentHashMap<>();
+    private Map<Integer, Map<Integer, Meal>> repository = new ConcurrentHashMap<>();
     private AtomicInteger counter = new AtomicInteger(0);
+    private static final Comparator<Meal> COMPARATOR = Comparator.comparing(Meal::getDate).reversed().thenComparing(Meal::getTime);
 
     {
-        MealsUtil.MEALS.forEach(MEAL -> {
-            MEAL.setUserId(SecurityUtil.authUserId());
-            save(MEAL);
-        });
+        MealsUtil.MEALS.forEach(MEAL -> save(MEAL, SecurityUtil.authUserId()));
         Meal meal = new Meal(8, LocalDateTime.of(2015, Month.MAY, 30, 12, 0), "Полдник", 500);
-        meal.setUserId(2);
-        save(meal);
+        save(meal, 2);
     }
 
     @Override
-    public Meal save(Meal meal) {
+    public Meal save(Meal meal, int userId) {
         log.info("save {}", meal);
-        if (meal == null) {
-            return null;
-        }
 
         if (meal.isNew()) {
-            Integer newId = counter.incrementAndGet();
-            meal.setId(newId);
-            repository.put(meal.getId(), meal);
+            meal.setId(counter.incrementAndGet());
+            repository.putIfAbsent(userId, new ConcurrentHashMap<>());
+            repository.get(userId).put(meal.getId(), meal);
             return meal;
         }
-        return check(repository.computeIfPresent(meal.getId(), (id, oldMeal) -> meal), meal.getUserId());
+        Map<Integer, Meal> mealMap = repository.get(userId);
+        return mealMap != null ? mealMap.computeIfPresent(meal.getId(), (id, oldMeal) -> meal) : null;
+
     }
 
     @Override
     public boolean delete(int mealId, int userId) {
-        return get(mealId, userId) != null && repository.remove(mealId) != null;
+        log.info("delete {}", mealId);
+        return get(mealId, userId) != null && repository.get(userId).remove(mealId) != null;
 
     }
 
     @Override
+
     public Meal get(int mealId, int userId) {
-        Meal getMeal = repository.get(mealId);
-        return check(getMeal, userId);
+        log.info("get {}", mealId);
+        return repository.get(userId).getOrDefault(mealId, null);
     }
 
     @Override
     public List<Meal> getAll(int userId) {
-        return repository.values().stream()
-                .filter(meal -> meal.getUserId() == userId)
-                .sorted((o1, o2) -> {
-                    int compare = o2.getDateTime().toLocalDate().compareTo(o1.getDateTime().toLocalDate());
-                    if (compare == 0) {
-                        return o1.getDateTime().toLocalTime().compareTo(o2.getDateTime().toLocalTime());
-                    }
-                    return compare;
-                })
+        log.info("getAll {}", userId);
+        return repository.getOrDefault(userId, Collections.emptyMap()).values()
+                .stream()
+                .sorted(COMPARATOR)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Meal> getBetweenDates(int userId, LocalDate startDate, LocalDate endDate) {
-        return getAll(userId).stream()
-                .filter(meal -> DateTimeUtil.isDateBetween(meal.getDate(), startDate, endDate))
+        log.info("getBetweenDates {}", userId);
+        return repository.getOrDefault(userId, Collections.emptyMap()).values()
+                .stream()
+                .filter(meal -> DateTimeUtil.isBetween(meal.getDate(), startDate, endDate))
+                .sorted(COMPARATOR)
                 .collect(Collectors.toList());
-    }
-
-    private Meal check(Meal checkMeal, int userId) {
-        if (checkMeal == null || checkMeal.getUserId() != userId) {
-            return null;
-        }
-        return checkMeal;
     }
 }
 

@@ -4,9 +4,7 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.repository.inmemory.InMemoryMealRepository;
 import ru.javawebinar.topjava.service.MealService;
-import ru.javawebinar.topjava.service.UserService;
 import ru.javawebinar.topjava.to.MealTo;
-import ru.javawebinar.topjava.web.meal.MealRestController;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,7 +34,7 @@ public class MealsUtil {
     }
 
     public static List<MealTo> getFilteredTos(Collection<Meal> meals, int caloriesPerDay, LocalTime startTime, LocalTime endTime) {
-        return getFiltered(meals, caloriesPerDay, meal -> DateTimeUtil.isTimeBetween(meal.getTime(), startTime, endTime));
+        return getFiltered(meals, caloriesPerDay, meal -> DateTimeUtil.isBetween(meal.getTime(), startTime, endTime));
     }
 
     private static List<MealTo> getFiltered(Collection<Meal> meals, int caloriesPerDay, Predicate<Meal> filter) {
@@ -54,22 +52,4 @@ public class MealsUtil {
     private static MealTo createTo(Meal meal, boolean excess) {
         return new MealTo(meal.getId(), meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
     }
-
-    public static void main(String[] args) {
-        MealRepository mealRepository = new InMemoryMealRepository();
-        List<Meal> meals = mealRepository.getBetweenDates(1,
-                LocalDate.of(2015, Month.MAY, 30),
-                LocalDate.of(2015, Month.MAY, 31));
-        meals.forEach(System.out::println);
-
-        MealService mealService= new MealService(new InMemoryMealRepository());
-        List<MealTo> list = mealService.getBetweenDateTimes(2, DEFAULT_CALORIES_PER_DAY, LocalDate.of(2015, Month.MAY, 30),
-                LocalDate.of(2015, Month.MAY, 31), null, null);
-
-        list.forEach(System.out::println);
-
-        mealService.createUpdate(new Meal(LocalDateTime.of(2015, Month.MAY, 29, 20, 0), "Ужин", 510));
-        List<MealTo> list1 = mealService.getAll(1, DEFAULT_CALORIES_PER_DAY);
-        list1.forEach(System.out::println);
-}
 }

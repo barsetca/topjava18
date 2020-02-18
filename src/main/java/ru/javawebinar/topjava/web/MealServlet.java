@@ -6,7 +6,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.to.MealTo;
-import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.web.meal.MealRestController;
 
 import javax.servlet.ServletConfig;
@@ -15,7 +14,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
@@ -46,17 +47,15 @@ public class MealServlet extends HttpServlet {
         String action = request.getParameter("action");
 
         if ("filter".equals(action)) {
-            LocalDateTime startDateTime = DateTimeUtil.stringToStartDate(request.getParameter("dateFrom"),
-                    request.getParameter("timeFrom"));
-            LocalDateTime endDateTime = DateTimeUtil.stringToEndDate(request.getParameter("dateTo"),
-                    request.getParameter("timeTo"));
+            LocalDate startDate = stringToLocalDate(request.getParameter("dateFrom"));
+            LocalDate endDate = stringToLocalDate(request.getParameter("dateTo"));
+            LocalTime startTime = stringToLocalTime(request.getParameter("timeFrom"));
+            LocalTime endTime = stringToLocalTime(request.getParameter("timeTo"));
 
-            List<MealTo> mealTos = mealRestController.getBetweenDateTimes(startDateTime, endDateTime);
+            List<MealTo> mealTos = mealRestController.getBetweenDateTimes(startDate, endDate, startTime, endTime);
 
             request.setAttribute("meals", mealTos);
             request.getRequestDispatcher("/meals.jsp").forward(request, response);
-
-
         } else {
             Meal meal = new Meal(id.isEmpty() ? null : Integer.parseInt(id),
                     LocalDateTime.parse(request.getParameter("dateTime")),
@@ -104,5 +103,13 @@ public class MealServlet extends HttpServlet {
         String paramId = Objects.requireNonNull(request.getParameter("id"));
         return Integer.parseInt(paramId);
 
+    }
+
+    private LocalDate stringToLocalDate(String date) {
+        return "".equals(date) ? null : LocalDate.parse(date);
+    }
+
+    private LocalTime stringToLocalTime(String time) {
+        return "".equals(time) ? null : LocalTime.parse(time);
     }
 }

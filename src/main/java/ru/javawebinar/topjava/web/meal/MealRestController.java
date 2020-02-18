@@ -9,7 +9,8 @@ import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.web.SecurityUtil;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Controller
@@ -22,14 +23,14 @@ public class MealRestController {
 
     public Meal createUpdate(Meal meal) {
         log.info("createUpdate");
-        meal.setUserId(SecurityUtil.authUserId());
-        return service.createUpdate(meal);
+        int userId = SecurityUtil.authUserId();
+        return service.createUpdate(meal, userId);
     }
 
-    public boolean delete(int mealId) {
+    public void delete(int mealId) {
         log.info("delete");
         int userId = SecurityUtil.authUserId();
-        return service.delete(mealId, userId);
+        service.delete(mealId, userId);
     }
 
     public Meal get(int mealId) {
@@ -45,12 +46,26 @@ public class MealRestController {
         return service.getAll(userId, userCaloriesPerDay);
     }
 
-    public List<MealTo> getBetweenDateTimes(LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    public List<MealTo> getBetweenDateTimes(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
         log.info("getBetweenDateTimes");
 
         int userId = SecurityUtil.authUserId();
         int userCaloriesPerDay = SecurityUtil.authUserCaloriesPerDay();
-        return service.getBetweenDateTimes(userId, userCaloriesPerDay, startDateTime.toLocalDate(), endDateTime.toLocalDate(),
-                startDateTime.toLocalTime(), endDateTime.toLocalTime());
+
+        if (startTime == null) {
+            startTime = LocalTime.MIN;
+        }
+        if (endTime == null) {
+            endTime = LocalTime.MAX;
+        }
+
+        if (startDate == null) {
+            startDate = LocalDate.of(1900, 1, 1);
+        }
+        if (endDate == null) {
+            endDate = LocalDate.now();
+        }
+
+        return service.getBetweenDateTimes(userId, userCaloriesPerDay, startDate, endDate, startTime, endTime);
     }
 }
