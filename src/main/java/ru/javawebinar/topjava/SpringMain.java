@@ -37,7 +37,7 @@ public class SpringMain {
             mealRestController.getAll().forEach(System.out::println);
             System.out.println();
 
-            mealRestController.createUpdate(new Meal(LocalDateTime.of(2015, Month.MAY, 30, 11, 0), "Завтрак", 0));
+            mealRestController.create(new Meal(LocalDateTime.of(2015, Month.MAY, 30, 11, 0), "Завтрак", 0));
             System.out.println();
             mealRestController.getAll().forEach(System.out::println);
             System.out.println();
@@ -49,7 +49,7 @@ public class SpringMain {
 //            mealRestController.createUpdate(meal);
             System.out.println();
 //            System.out.println(mealRestController.get(8));
-            mealRestController.createUpdate(new Meal(7, LocalDateTime.of(2015, Month.MAY, 30, 12, 0), "Полдник", 500));
+            mealRestController.update(new Meal(7, LocalDateTime.of(2015, Month.MAY, 30, 12, 0), "Полдник", 500));
             System.out.println();
             System.out.println(mealRestController.get(7));
             mealRestController.delete(7);

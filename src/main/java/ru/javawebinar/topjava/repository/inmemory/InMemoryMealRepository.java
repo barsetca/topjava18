@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Repository
@@ -60,24 +61,25 @@ public class InMemoryMealRepository implements MealRepository {
 
     public Meal get(int mealId, int userId) {
         log.info("get {}", mealId);
-        return repository.get(userId).getOrDefault(mealId, null);
+        return repository.getOrDefault(userId, Collections.emptyMap()).getOrDefault(mealId, null);
     }
 
     @Override
     public List<Meal> getAll(int userId) {
         log.info("getAll {}", userId);
-        return repository.getOrDefault(userId, Collections.emptyMap()).values()
-                .stream()
-                .sorted(COMPARATOR)
-                .collect(Collectors.toList());
+        return getListAllFilter(userId, meal -> true);
     }
 
     @Override
     public List<Meal> getBetweenDates(int userId, LocalDate startDate, LocalDate endDate) {
         log.info("getBetweenDates {}", userId);
+        return getListAllFilter(userId, meal -> DateTimeUtil.isBetween(meal.getDate(), startDate, endDate));
+    }
+
+    private List<Meal> getListAllFilter(int userId, Predicate<Meal> filter) {
         return repository.getOrDefault(userId, Collections.emptyMap()).values()
                 .stream()
-                .filter(meal -> DateTimeUtil.isBetween(meal.getDate(), startDate, endDate))
+                .filter(filter)
                 .sorted(COMPARATOR)
                 .collect(Collectors.toList());
     }

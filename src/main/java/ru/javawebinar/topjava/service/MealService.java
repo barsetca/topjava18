@@ -24,7 +24,11 @@ public class MealService {
         this.repository = repository;
     }
 
-    public Meal createUpdate(Meal meal, int userId) {
+    public Meal create(Meal meal, int userId) {
+        return repository.save(meal, userId);
+    }
+
+    public Meal update(Meal meal, int userId) {
         return checkNotFoundWithId(repository.save(meal, userId), userId);
     }
 
@@ -43,6 +47,7 @@ public class MealService {
 
     public List<MealTo> getBetweenDateTimes(int userId, int userCaloriesPerDay,
                                             LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
+
         return MealsUtil.getFilteredTos(repository.getBetweenDates(userId, startDate, endDate), userCaloriesPerDay, startTime, endTime);
     }
 }
