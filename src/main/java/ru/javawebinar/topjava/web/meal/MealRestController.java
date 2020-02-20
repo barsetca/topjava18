@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.to.MealTo;
+import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.web.SecurityUtil;
 
 import java.time.LocalDate;
@@ -68,10 +69,10 @@ public class MealRestController {
             endTime = LocalTime.MAX;
         }
         if (startDate == null) {
-            startDate = LocalDate.of(1900, 1, 1);
+            startDate = DateTimeUtil.LOCAL_DATE_MIN;
         }
         if (endDate == null) {
-            endDate = LocalDate.of(3000, 1, 1);
+            endDate = DateTimeUtil.LOCAL_DATE_MAX;
         }
 
         return service.getBetweenDateTimes(userId, userCaloriesPerDay, startDate, endDate, startTime, endTime);
