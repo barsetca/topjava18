@@ -18,7 +18,7 @@ import java.util.Date;
 
 import static ru.javawebinar.topjava.UserTestData.*;
 
-@ContextConfiguration("classpath:spring/spring-app1.xml")
+@ContextConfiguration({"classpath:spring/spring-app1.xml", "classpath:spring/spring-app2.xml"})
 @RunWith(SpringRunner.class)
 public class InMemoryAdminRestControllerSpringTest {
 

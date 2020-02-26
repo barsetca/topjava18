@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.repository.inmemory;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.model.AbstractBaseEntity;
 
@@ -12,13 +11,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Repository
 public class InMemoryBaseRepository<T extends AbstractBaseEntity> {
 
-
     private static AtomicInteger counter = new AtomicInteger(0);
-    Map<Integer, T> map = new ConcurrentHashMap<>();
 
-    @Autowired
-    public InMemoryBaseRepository() {
-    }
+    Map<Integer, T> map = new ConcurrentHashMap<>();
 
     public T save(T entry) {
         if (entry.isNew()) {

@@ -17,7 +17,7 @@ import java.util.Arrays;
 public class SpringMain {
     public static void main(String[] args) {
         // java 7 automatic resource management
-        try (ConfigurableApplicationContext appCtx = new ClassPathXmlApplicationContext("spring/spring-app1.xml")) {
+        try (ConfigurableApplicationContext appCtx = new ClassPathXmlApplicationContext("spring/spring-app1.xml", "spring/spring-app2.xml")) {
             System.out.println("Bean definition names: " + Arrays.toString(appCtx.getBeanDefinitionNames()));
 
             AdminRestController adminUserController = appCtx.getBean(AdminRestController.class);

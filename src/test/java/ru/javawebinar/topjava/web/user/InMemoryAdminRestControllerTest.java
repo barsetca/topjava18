@@ -18,7 +18,7 @@ import static ru.javawebinar.topjava.UserTestData.*;
 
 @ContextConfiguration({
         "classpath:spring/spring-app1.xml",
-
+        "classpath:spring/spring-app2.xml"
 })
 
 public class InMemoryAdminRestControllerTest {
@@ -27,7 +27,7 @@ public class InMemoryAdminRestControllerTest {
 
     @BeforeClass
     public static void beforeClass() {
-        appCtx = new ClassPathXmlApplicationContext("spring/spring-app1.xml");
+        appCtx = new ClassPathXmlApplicationContext("spring/spring-app1.xml", "spring/spring-app2.xml");
         System.out.println("\n" + Arrays.toString(appCtx.getBeanDefinitionNames()) + "\n");
         controller = appCtx.getBean(AdminRestController.class);
     }
@@ -96,5 +96,4 @@ public class InMemoryAdminRestControllerTest {
         controller.update(updated, USER_ID);
         assertMatch(controller.get(USER_ID), updated);
     }
-
 }
