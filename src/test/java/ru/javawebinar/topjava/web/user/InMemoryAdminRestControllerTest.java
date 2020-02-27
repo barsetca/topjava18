@@ -17,8 +17,8 @@ import java.util.Date;
 import static ru.javawebinar.topjava.UserTestData.*;
 
 @ContextConfiguration({
-        "classpath:spring/spring-app1.xml",
-        "classpath:spring/spring-app2.xml"
+        "classpath:spring/spring-app-inmemory.xml",
+        "classpath:spring/spring-app2-web_service.xml"
 })
 
 public class InMemoryAdminRestControllerTest {
@@ -27,7 +27,7 @@ public class InMemoryAdminRestControllerTest {
 
     @BeforeClass
     public static void beforeClass() {
-        appCtx = new ClassPathXmlApplicationContext("spring/spring-app1.xml", "spring/spring-app2.xml");
+        appCtx = new ClassPathXmlApplicationContext("spring/spring-app-inmemory.xml", "spring/spring-app2-web_service.xml");
         System.out.println("\n" + Arrays.toString(appCtx.getBeanDefinitionNames()) + "\n");
         controller = appCtx.getBean(AdminRestController.class);
     }
