@@ -1,5 +1,7 @@
 package ru.javawebinar.topjava.service;
 
+import org.junit.AfterClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,11 +9,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.TransactionSystemException;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.LinkedList;
+import java.util.List;
 
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
@@ -25,8 +30,19 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
 
+    public static List<String> listMethodsTime = new LinkedList<>();
+
     @Autowired
     private MealService service;
+
+    @Rule
+    // public ExpectedException thrown = ExpectedException.none();
+    public TimeTestMyRule testMyRule = new TimeTestMyRule(listMethodsTime);
+
+    @AfterClass
+    public static void printMethodsTime() {
+        listMethodsTime.forEach(System.out::println);
+    }
 
     @Test
     public void delete() throws Exception {
@@ -51,6 +67,34 @@ public class MealServiceTest {
         newMeal.setId(created.getId());
         assertMatch(newMeal, created);
         assertMatch(service.getAll(USER_ID), newMeal, MEAL6, MEAL5, MEAL4, MEAL3, MEAL2, MEAL1);
+    }
+
+    @Test(expected = TransactionSystemException.class)
+    public void createDescriptionIsEmpty() throws Exception {
+        Meal newMeal = getCreated();
+        newMeal.setDescription("");
+        service.create(newMeal, USER_ID);
+    }
+
+    @Test(expected = TransactionSystemException.class)
+    public void createDescriptionIsNull() throws Exception {
+        Meal newMeal = getCreated();
+        newMeal.setDescription(null);
+        service.create(newMeal, USER_ID);
+    }
+
+    @Test(expected = TransactionSystemException.class)
+    public void createDateTimeIsNull() throws Exception {
+        Meal newMeal = getCreated();
+        newMeal.setDateTime(null);
+        service.create(newMeal, USER_ID);
+    }
+
+    @Test(expected = TransactionSystemException.class)
+    public void createCaloriesIsNull() throws Exception {
+        Meal newMeal = getCreated();
+        newMeal.setCalories(null);
+        service.create(newMeal, USER_ID);
     }
 
     @Test
@@ -79,6 +123,34 @@ public class MealServiceTest {
     @Test(expected = NotFoundException.class)
     public void updateNotFound() throws Exception {
         service.update(MEAL1, ADMIN_ID);
+    }
+
+    @Test(expected = TransactionSystemException.class)
+    public void updateDescriptionIsEmpty() throws Exception {
+        Meal updated = getUpdated();
+        updated.setDescription("");
+        service.update(updated, USER_ID);
+    }
+
+    @Test(expected = TransactionSystemException.class)
+    public void updateDescriptionIsNull() throws Exception {
+        Meal updated = getUpdated();
+        updated.setDescription(null);
+        service.update(updated, USER_ID);
+    }
+
+    @Test(expected = TransactionSystemException.class)
+    public void updateDateTimeIsNull() throws Exception {
+        Meal updated = getUpdated();
+        updated.setDateTime(null);
+        service.update(updated, USER_ID);
+    }
+
+    @Test(expected = TransactionSystemException.class)
+    public void updateCalotiesIsNull() throws Exception {
+        Meal updated = getUpdated();
+        updated.setCalories(null);
+        service.update(updated, USER_ID);
     }
 
     @Test
