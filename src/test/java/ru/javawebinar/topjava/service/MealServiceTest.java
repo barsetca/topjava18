@@ -3,7 +3,12 @@ package ru.javawebinar.topjava.service;
 import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.Stopwatch;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -17,6 +22,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
@@ -29,19 +35,35 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @RunWith(SpringJUnit4ClassRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
-
+    private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
     public static List<String> listMethodsTime = new LinkedList<>();
+
+    private static void logInfo(Description description, String status, long nanos) {
+        String testName = description.getMethodName();
+        String massage = String.format("Test %s %s, spent %d ms",
+                testName, status, TimeUnit.NANOSECONDS.toMillis(nanos));
+        listMethodsTime.add(massage);
+        log.info(massage);
+
+    }
 
     @Autowired
     private MealService service;
 
     @Rule
-    // public ExpectedException thrown = ExpectedException.none();
-    public TimeTestMyRule testMyRule = new TimeTestMyRule(listMethodsTime);
+    public ExpectedException thrown = ExpectedException.none();
+
+    @Rule
+    public Stopwatch stopwatch = new Stopwatch() {
+        @Override
+        protected void finished(long nanos, Description description) {
+            logInfo(description, "finished", nanos);
+        }
+    };
 
     @AfterClass
     public static void printMethodsTime() {
-        listMethodsTime.forEach(System.out::println);
+        listMethodsTime.forEach(log::info);
     }
 
     @Test
@@ -50,13 +72,17 @@ public class MealServiceTest {
         assertMatch(service.getAll(USER_ID), MEAL6, MEAL5, MEAL4, MEAL3, MEAL2);
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void deleteNotFound() throws Exception {
+        thrown.expect(NotFoundException.class);
+        thrown.expectMessage("Not found entity with id=");
         service.delete(1, USER_ID);
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void deleteNotOwn() throws Exception {
+        thrown.expect(NotFoundException.class);
+        thrown.expectMessage("Not found entity with id=");
         service.delete(MEAL1_ID, ADMIN_ID);
     }
 
@@ -69,31 +95,59 @@ public class MealServiceTest {
         assertMatch(service.getAll(USER_ID), newMeal, MEAL6, MEAL5, MEAL4, MEAL3, MEAL2, MEAL1);
     }
 
-    @Test(expected = TransactionSystemException.class)
+    @Test
     public void createDescriptionIsEmpty() throws Exception {
+        thrown.expect(TransactionSystemException.class);
         Meal newMeal = getCreated();
         newMeal.setDescription("");
         service.create(newMeal, USER_ID);
     }
 
-    @Test(expected = TransactionSystemException.class)
+    @Test
     public void createDescriptionIsNull() throws Exception {
+        thrown.expect(TransactionSystemException.class);
         Meal newMeal = getCreated();
         newMeal.setDescription(null);
         service.create(newMeal, USER_ID);
     }
 
-    @Test(expected = TransactionSystemException.class)
+    @Test
+    public void createDescriptionLessMin() throws Exception {
+        thrown.expect(TransactionSystemException.class);
+        Meal newMeal = getCreated();
+        newMeal.setDescription("a");
+        service.create(newMeal, USER_ID);
+    }
+
+    @Test
+    public void createDescriptionMoreMax() throws Exception {
+        thrown.expect(TransactionSystemException.class);
+        Meal newMeal = getCreated();
+        newMeal.setDescription(MAX_MORE_DESCRIPTION);
+        service.create(newMeal, USER_ID);
+    }
+
+    @Test
     public void createDateTimeIsNull() throws Exception {
+        thrown.expect(TransactionSystemException.class);
         Meal newMeal = getCreated();
         newMeal.setDateTime(null);
         service.create(newMeal, USER_ID);
     }
 
-    @Test(expected = TransactionSystemException.class)
-    public void createCaloriesIsNull() throws Exception {
+    @Test
+    public void createCaloriesLessMin() throws Exception {
+        thrown.expect(TransactionSystemException.class);
         Meal newMeal = getCreated();
-        newMeal.setCalories(null);
+        newMeal.setCalories(1);
+        service.create(newMeal, USER_ID);
+    }
+
+    @Test
+    public void createCaloriesMoreMax() throws Exception {
+        thrown.expect(TransactionSystemException.class);
+        Meal newMeal = getCreated();
+        newMeal.setCalories(6000);
         service.create(newMeal, USER_ID);
     }
 
@@ -103,13 +157,17 @@ public class MealServiceTest {
         assertMatch(actual, ADMIN_MEAL1);
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void getNotFound() throws Exception {
+        thrown.expect(NotFoundException.class);
+        thrown.expectMessage("Not found entity with id=");
         service.get(1, USER_ID);
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void getNotOwn() throws Exception {
+        thrown.expect(NotFoundException.class);
+        thrown.expectMessage("Not found entity with id=");
         service.get(MEAL1_ID, ADMIN_ID);
     }
 
@@ -120,36 +178,67 @@ public class MealServiceTest {
         assertMatch(service.get(MEAL1_ID, USER_ID), updated);
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void updateNotFound() throws Exception {
+        thrown.expect(NotFoundException.class);
+        thrown.expectMessage("Not found entity with id=");
         service.update(MEAL1, ADMIN_ID);
     }
 
-    @Test(expected = TransactionSystemException.class)
+    @Test
     public void updateDescriptionIsEmpty() throws Exception {
+        thrown.expect(TransactionSystemException.class);
         Meal updated = getUpdated();
         updated.setDescription("");
         service.update(updated, USER_ID);
     }
 
-    @Test(expected = TransactionSystemException.class)
+    @Test
     public void updateDescriptionIsNull() throws Exception {
+        thrown.expect(TransactionSystemException.class);
         Meal updated = getUpdated();
         updated.setDescription(null);
         service.update(updated, USER_ID);
     }
 
-    @Test(expected = TransactionSystemException.class)
+    @Test
+    public void updateDescriptionLessMin() throws Exception {
+        thrown.expect(TransactionSystemException.class);
+        Meal updated = getUpdated();
+        updated.setDescription("a");
+        service.update(updated, USER_ID);
+    }
+
+    @Test
+    public void updateDescriptionMoreMax() throws Exception {
+        thrown.expect(TransactionSystemException.class);
+        Meal updated = getUpdated();
+        updated.setDescription(MAX_MORE_DESCRIPTION);
+        service.update(updated, USER_ID);
+    }
+
+
+    @Test
     public void updateDateTimeIsNull() throws Exception {
+        thrown.expect(TransactionSystemException.class);
         Meal updated = getUpdated();
         updated.setDateTime(null);
         service.update(updated, USER_ID);
     }
 
-    @Test(expected = TransactionSystemException.class)
-    public void updateCalotiesIsNull() throws Exception {
+    @Test
+    public void updateCaloriesLessMin() throws Exception {
+        thrown.expect(TransactionSystemException.class);
         Meal updated = getUpdated();
-        updated.setCalories(null);
+        updated.setCalories(1);
+        service.update(updated, USER_ID);
+    }
+
+    @Test
+    public void updateCaloriesMoreMax() throws Exception {
+        thrown.expect(TransactionSystemException.class);
+        Meal updated = getUpdated();
+        updated.setCalories(6000);
         service.update(updated, USER_ID);
     }
 

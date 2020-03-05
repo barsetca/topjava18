@@ -14,6 +14,10 @@ public class MealTestData {
     public static final int MEAL1_ID = START_SEQ + 2;
     public static final int ADMIN_MEAL_ID = START_SEQ + 8;
 
+    public static final String MAX_MORE_DESCRIPTION =
+            "0123456789 0123456789 0123456789 0123456789 0123456789 0123456789" +
+                    "0123456789 0123456789 0123456789 0123456789 0123456789 0123456789";
+
     public static final Meal MEAL1 = new Meal(MEAL1_ID, of(2015, Month.MAY, 30, 10, 0), "Завтрак", 500);
     public static final Meal MEAL2 = new Meal(MEAL1_ID + 1, of(2015, Month.MAY, 30, 13, 0), "Обед", 1000);
     public static final Meal MEAL3 = new Meal(MEAL1_ID + 2, of(2015, Month.MAY, 30, 20, 0), "Ужин", 500);
@@ -34,7 +38,8 @@ public class MealTestData {
     }
 
     public static void assertMatch(Meal actual, Meal expected) {
-        assertThat(actual).isEqualToIgnoringGivenFields(expected, "user");
+        assertThat(actual).isEqualToComparingOnlyGivenFields(expected,
+                "id", "dateTime", "description", "calories");
     }
 
     public static void assertMatch(Iterable<Meal> actual, Meal... expected) {
