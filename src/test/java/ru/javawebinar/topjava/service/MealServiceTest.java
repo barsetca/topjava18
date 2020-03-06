@@ -23,6 +23,7 @@ import java.time.Month;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
@@ -63,7 +64,16 @@ public class MealServiceTest {
 
     @AfterClass
     public static void printMethodsTime() {
-        listMethodsTime.forEach(log::info);
+
+//        listMethodsTime.forEach(new Consumer<String>() {
+//            @Override
+//            public void accept(String msg) {
+//                log.info(msg);
+//            }
+//        });
+        StringBuilder stringMethodsTime = new StringBuilder();
+        listMethodsTime.forEach(s -> stringMethodsTime.append(s + "\n"));
+        log.info(stringMethodsTime.toString());
     }
 
     @Test

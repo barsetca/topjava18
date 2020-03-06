@@ -35,7 +35,6 @@ public class Meal extends AbstractBaseEntity {
     private String description;
 
     @Column(name = "calories", nullable = false)
-    @NotNull
     @Min(10)
     @Max(5000)
     private int calories;
