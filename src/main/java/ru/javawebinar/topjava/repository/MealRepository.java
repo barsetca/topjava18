@@ -6,6 +6,7 @@ import ru.javawebinar.topjava.model.Meal;
 import java.time.LocalDate;
 import java.util.List;
 
+
 public interface MealRepository {
     // null if updated meal do not belong to userId
     Meal save(Meal meal, int userId);
@@ -21,4 +22,8 @@ public interface MealRepository {
 
     // ORDERED dateTime desc
     List<Meal> getBetweenInclusive(@Nullable LocalDate startDate, @Nullable LocalDate endDate, int userId);
+
+    default Meal getMealWithUser(int id, int userId) {
+        throw new UnsupportedOperationException("Method getMealWithUser implemented only for datajpa");
+    }
 }

@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.repository.jdbc;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,26 +14,21 @@ import ru.javawebinar.topjava.repository.MealRepository;
 import java.time.LocalDate;
 import java.util.List;
 
-import static ru.javawebinar.topjava.util.DateTimeUtil.getEndExclusive;
-import static ru.javawebinar.topjava.util.DateTimeUtil.getStartInclusive;
-
 @Repository
-public class JdbcMealRepository implements MealRepository {
+public abstract class JdbcMealRepository implements MealRepository {
 
-    private static final RowMapper<Meal> ROW_MAPPER = BeanPropertyRowMapper.newInstance(Meal.class);
+    protected static final RowMapper<Meal> ROW_MAPPER = BeanPropertyRowMapper.newInstance(Meal.class);
 
-    private final JdbcTemplate jdbcTemplate;
+    protected final JdbcTemplate jdbcTemplate;
 
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    protected final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    private final SimpleJdbcInsert insertMeal;
+    protected final SimpleJdbcInsert insertMeal;
 
-    @Autowired
     public JdbcMealRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.insertMeal = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("meals")
                 .usingGeneratedKeyColumns("id");
-
         this.jdbcTemplate = jdbcTemplate;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
@@ -45,8 +39,8 @@ public class JdbcMealRepository implements MealRepository {
                 .addValue("id", meal.getId())
                 .addValue("description", meal.getDescription())
                 .addValue("calories", meal.getCalories())
-                .addValue("date_time", meal.getDateTime())
                 .addValue("user_id", userId);
+        addDateParamToMapSqlParameterSource(map, meal);
 
         if (meal.isNew()) {
             Number newId = insertMeal.executeAndReturnKey(map);
@@ -85,6 +79,14 @@ public class JdbcMealRepository implements MealRepository {
     public List<Meal> getBetweenInclusive(LocalDate startDate, LocalDate endDate, int userId) {
         return jdbcTemplate.query(
                 "SELECT * FROM meals WHERE user_id=? AND date_time >=? AND date_time < ? ORDER BY date_time DESC",
-                ROW_MAPPER, userId, getStartInclusive(startDate), getEndExclusive(endDate));
+                ROW_MAPPER, userId, convertStartDate(startDate), convertEndDate(endDate));
+
+        //getStartInclusive(startDate), getEndExclusive(endDate)
     }
+
+    protected abstract void addDateParamToMapSqlParameterSource(MapSqlParameterSource map, Meal meal);
+
+    protected abstract <T> T convertEndDate(LocalDate endDate);
+
+    protected abstract <T> T convertStartDate(LocalDate startDate);
 }
