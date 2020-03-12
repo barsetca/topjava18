@@ -5,10 +5,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.User;
-import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.repository.UserRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -19,19 +17,9 @@ public class DataJpaUserRepository implements UserRepository {
     @Autowired
     private CrudUserRepository crudRepository;
 
-    @Autowired
-    private MealRepository mealRepository;
-
     @Override
     @Transactional
     public User save(User user) {
-        //mealRepository.getAll(user.getId());
-        if (user.isNew()) {
-            user.setMeals(new ArrayList<>());
-        } else {
-            int id = user.getId();
-            user.setMeals(mealRepository.getAll(user.getId()));
-        }
         return crudRepository.save(user);
     }
 
@@ -59,8 +47,6 @@ public class DataJpaUserRepository implements UserRepository {
     @Override
     @Transactional
     public User getWithListMeals(int id) {
-        User user = get(id);
-        user.setMeals(mealRepository.getAll(id));
-        return user;
+        return crudRepository.findOneWithMeals(id);
     }
 }
