@@ -6,8 +6,8 @@
 <html>
 <jsp:include page="fragments/headTag.jsp"/>
 <head>
-    <title>Meals</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Meals<spring:message code="meal.title"/></title>
+    <%--    <link rel="stylesheet" href="resources/css/style.css">--%>
 </head>
 <body>
 <jsp:include page="fragments/bodyHeader.jsp"/>
@@ -17,28 +17,28 @@
     <%--    C:\newprojects\topjava18\src\main\webapp\WEB-INF\jsp\index.jsp--%>
     <hr/>
     <h2><h3><spring:message code="meal.title"/></h3></h2>
-    <form method="post" action="meals/filter">
+    <form method="get" action="meals/filter">
 
         <dl>
-            <dt>From Date:</dt>
+            <dt><spring:message code="meal.datefrom"/></dt>
             <dd><input type="date" name="startDate" value="${param.startDate}"></dd>
         </dl>
         <dl>
-            <dt>To Date:</dt>
+            <dt><spring:message code="meal.dateto"/></dt>
             <dd><input type="date" name="endDate" value="${param.endDate}"></dd>
         </dl>
         <dl>
-            <dt>From Time:</dt>
+            <dt><spring:message code="meal.timefrom"/></dt>
             <dd><input type="time" name="startTime" value="${param.startTime}"></dd>
         </dl>
         <dl>
-            <dt>To Time:</dt>
+            <dt><spring:message code="meal.timeto"/></dt>
             <dd><input type="time" name="endTime" value="${param.endTime}"></dd>
         </dl>
         <button type="submit"><spring:message code="meal.filter"/></button>
     </form>
     <hr/>
-    <a href="meals/create">Add Meal</a>
+    <a href="meals/create"><spring:message code="meal.add"/></a>
     <br><br>
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>
@@ -61,8 +61,8 @@
                 </td>
                 <td>${meal.description}</td>
                 <td>${meal.calories}</td>
-                <td><a href="meals/update?id=${meal.id}">Update</a></td>
-                <td><a href="meals/delete?id=${meal.id}">Delete</a></td>
+                <td><a href="meals/update?id=${meal.id}"><spring:message code="common.update"/></a></td>
+                <td><a href="meals/delete?id=${meal.id}"><spring:message code="common.delete"/></a></td>
             </tr>
         </c:forEach>
     </table>

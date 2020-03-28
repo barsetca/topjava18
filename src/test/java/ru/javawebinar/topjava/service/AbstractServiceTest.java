@@ -23,7 +23,9 @@ import static ru.javawebinar.topjava.util.ValidationUtil.getRootCause;
 
 @ContextConfiguration({
         "classpath:spring/spring-app.xml",
-        "classpath:spring/spring-db.xml"
+        "classpath:spring/spring-db.xml",
+       "classpath:spring/test-cache.xml"
+
 })
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -34,6 +36,7 @@ abstract public class AbstractServiceTest {
     public CacheManager cacheManager() {
         return new NoOpCacheManager();
     }
+
     @ClassRule
     public static ExternalResource summary = TimingRules.SUMMARY;
 

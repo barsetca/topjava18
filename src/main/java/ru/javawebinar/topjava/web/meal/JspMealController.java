@@ -61,6 +61,7 @@ public class JspMealController extends AbstractMealController {
                 LocalDateTime.parse(request.getParameter("dateTime")),
                 request.getParameter("description"),
                 Integer.parseInt(request.getParameter("calories")));
+
         if (StringUtils.isEmpty(mealId)) {
             super.create(meal);
         } else {
@@ -70,7 +71,7 @@ public class JspMealController extends AbstractMealController {
         return "redirect:/meals";
     }
 
-    @PostMapping("/filter")
+    @GetMapping("/filter")
     public String dateFilter(Model model, HttpServletRequest request) {
 
         LocalDate startDate = parseLocalDate(request.getParameter("startDate"));

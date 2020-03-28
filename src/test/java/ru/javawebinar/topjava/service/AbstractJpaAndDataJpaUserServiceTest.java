@@ -2,9 +2,6 @@ package ru.javawebinar.topjava.service;
 
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.support.NoOpCacheManager;
-import org.springframework.context.annotation.Bean;
 import ru.javawebinar.topjava.repository.JpaUtil;
 
 public abstract class AbstractJpaAndDataJpaUserServiceTest extends AbstractUserServiceTest {

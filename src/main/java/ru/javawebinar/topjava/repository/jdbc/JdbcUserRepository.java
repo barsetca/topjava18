@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
+import ru.javawebinar.topjava.repository.JdbcUtil;
 import ru.javawebinar.topjava.repository.UserRepository;
 
 import java.sql.PreparedStatement;
@@ -33,11 +34,13 @@ public class JdbcUserRepository implements UserRepository {
     private final SimpleJdbcInsert insertUser;
 
     @Autowired
+    JdbcUtil jdbcUtil;
+
+    @Autowired
     public JdbcUserRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.insertUser = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("id");
-
         this.jdbcTemplate = jdbcTemplate;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
@@ -45,22 +48,22 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     @Transactional
     public User save(User user) {
+        jdbcUtil.checkValidation(user);
         BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
 
         if (user.isNew()) {
             Number newKey = insertUser.executeAndReturnKey(parameterSource);
             int id = newKey.intValue();
             user.setId(id);
-            insertRolesToDb(user);
-
         } else if (namedParameterJdbcTemplate.update(
                 "UPDATE users SET name=:name, email=:email, password=:password, " +
                         "registered=:registered, enabled=:enabled, calories_per_day=:caloriesPerDay WHERE id=:id", parameterSource) == 0) {
             return null;
         } else {
             jdbcTemplate.update("DELETE FROM user_roles WHERE user_roles.user_id=?", user.getId());
-            insertRolesToDb(user);
+
         }
+        insertRolesToDb(user);
         return user;
     }
 
@@ -85,16 +88,14 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     public List<User> getAll() {
         List<User> users = jdbcTemplate.query("SELECT * FROM users ORDER BY name, email", ROW_MAPPER);
-
         Map<Integer, List<Role>> roleMap = new HashMap<>();
-        List<Map<String, Object>> rolesFill = jdbcTemplate.queryForList("SELECT * FROM user_roles");
-        for (Map row : rolesFill) {
-            System.out.println();
-            int id = (int) row.get("user_id");
-            Role role = Role.valueOf((String) row.get("role"));
+        jdbcTemplate.query("SELECT * FROM user_roles", (resultSet, row) -> {
+            int id = resultSet.getInt("user_id");
+            Role role = Role.valueOf(resultSet.getString("role"));
             roleMap.putIfAbsent(id, new ArrayList<>());
             roleMap.get(id).add(role);
-        }
+            return role;
+        });
         users.forEach(u -> u.setRoles(roleMap.get(u.getId())));
         return users;
     }
@@ -121,7 +122,6 @@ public class JdbcUserRepository implements UserRepository {
                         ps.setInt(1, user.getId());
                         ps.setString(2, roleList.get(i).name());
                     }
-
                     public int getBatchSize() {
                         return roleList.size();
                     }
