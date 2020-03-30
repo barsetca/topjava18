@@ -7,9 +7,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.Stopwatch;
 import org.junit.runner.RunWith;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.support.NoOpCacheManager;
-import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -24,18 +21,13 @@ import static ru.javawebinar.topjava.util.ValidationUtil.getRootCause;
 @ContextConfiguration({
         "classpath:spring/spring-app.xml",
         "classpath:spring/spring-db.xml",
-       "classpath:spring/test-cache.xml"
+        "classpath:spring/test-cache.xml"
 
 })
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 @ActiveProfiles(resolver = ActiveDbProfileResolver.class)
 abstract public class AbstractServiceTest {
-
-    @Bean
-    public CacheManager cacheManager() {
-        return new NoOpCacheManager();
-    }
 
     @ClassRule
     public static ExternalResource summary = TimingRules.SUMMARY;
