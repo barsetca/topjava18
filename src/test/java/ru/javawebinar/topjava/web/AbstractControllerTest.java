@@ -18,7 +18,8 @@ import javax.annotation.PostConstruct;
 @SpringJUnitWebConfig(locations = {
         "classpath:spring/spring-app.xml",
         "classpath:spring/spring-mvc.xml",
-        "classpath:spring/spring-db.xml"
+        "classpath:spring/spring-db.xml",
+        "classpath:spring/spring-cache.xml"
 })
 //@WebAppConfiguration
 //@ExtendWith(SpringExtension.class)
@@ -36,12 +37,6 @@ abstract public class AbstractControllerTest {
     protected MockMvc mockMvc;
 
     @Autowired
-    private CacheManager cacheManager;
-
-    @Autowired(required = false)
-    private JpaUtil jpaUtil;
-
-    @Autowired
     private WebApplicationContext webApplicationContext;
 
     @PostConstruct
@@ -52,11 +47,4 @@ abstract public class AbstractControllerTest {
                 .build();
     }
 
-    @BeforeEach
-    void setUp() {
-        cacheManager.getCache("users").clear();
-        if (jpaUtil != null) {
-            jpaUtil.clear2ndLevelHibernateCache();
-        }
-    }
 }

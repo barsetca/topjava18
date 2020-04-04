@@ -1,0 +1,86 @@
+###https://gist.github.com/subfuzion/08c5d85437d5d4f00e58
+
+### GetAll meals
+### curl http://localhost:8080/topjava/rest/user/meals
+GET http://localhost:8080/topjava/rest/user/meals
+Accept: application/json
+
+### Get meal id = 100008
+### # curl http://localhost:8080/topjava/rest/user/meals/100008
+GET http://localhost:8080/topjava/rest/user/meals/100008
+
+### GET filer between
+#### curl "http://localhost:8080/topjava/rest/user/meals/filter?startDate=2015-05-30&startTime=16:00&endDate=2015-05-30&endTime=23:00"
+GET http://localhost:8080/topjava/rest/user/meals/filter?startDate=2015-05-30&startTime=16:00&endDate=2015-05-30&endTime=23:00
+Accept: application/json
+
+### Create meal
+### curl -X POST -d '{"dateTime":"2015-05-27T17:00","description":"Created teaTime","calories":200}' -H "Content-Type:application/json" http://localhost:8080/topjava/rest/user/meals
+POST http://localhost:8080/topjava/rest/user/meals
+Content-Type: application/json
+
+{
+  "dateTime": "2015-05-27T17:00",
+  "description": "Created teaTime",
+  "calories": 200
+}
+
+### Update meal id = 100008
+### curl -X PUT -d '{"dateTime":"2015-05-25T17:00","description":"Update teaTime","calories":2000}' -H "Content-Type:application/json" http://localhost:8080/topjava/rest/user/meals/100008
+PUT http://localhost:8080/topjava/rest/user/meals/100008
+Content-Type: application/json
+
+{
+  "dateTime": "2015-05-25T17:00",
+  "description": "Update teaTime",
+  "calories": 2000
+}
+
+### DELETE meal id=100007
+###curl -X DELETE http://localhost:8080/topjava/rest/user/meals/100007
+DELETE http://localhost:8080/topjava/rest/user/meals/100007
+Accept: application/json
+
+### GetAll users
+### curl http://localhost:8080/topjava/rest/admin/users
+GET http://localhost:8080/topjava/rest/admin/users
+Accept: application/json
+
+### Get uaer id = 100000
+### curl http://localhost:8080/topjava/rest/admin/users/100000
+GET http://localhost:8080/topjava/rest/admin/users/100000
+Accept: application/json
+
+### Update user id = 100000
+### curl -X PUT -d '{"name":"NameUpdate","email":"update@gmail.com","password":"passwordUpdate","caloriesPerDay":2500}' -H "Content-Type:application/json" http://localhost:8080/topjava/rest/admin/users/100000
+PUT http://localhost:8080/topjava/rest/admin/users/100000
+Content-Type: application/json
+
+{
+  "name": "NameUpdate",
+  "email": "update@gmail.com",
+  "password": "passwordUpdate",
+  "caloriesPerDay": 2500
+}
+
+### Create user
+### curl -X POST -d '{"name":"NewName","email":"new@nuevo.ru","password":"passwordNew","roles":["ROLE_USER"],"caloriesPerDay":1500}' -H "Content-Type:application/json" http://localhost:8080/topjava/rest/admin/users
+POST http://localhost:8080/topjava/rest/admin/users
+Content-Type: application/json
+
+{
+  "name": "NewName",
+  "email": "new@nuevo.ru",
+  "password": "passwordNew",
+  "roles": [
+    "ROLE_USER"
+  ],
+  "caloriesPerDay": 1500
+}
+
+###
+
+
+
+
+
