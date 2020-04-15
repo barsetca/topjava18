@@ -27,3 +27,13 @@
 
 #### update Meals
 `curl -s -X PUT -d '{"dateTime":"2015-05-30T07:00", "description":"Updated breakfast", "calories":200}' -H 'Content-Type: application/json' http://localhost:8080/topjava/rest/profile/meals/100003 --user user@yandex.ru:password`
+
+
+#### changeAEnable Users 100000
+`curl -s -X POST -H 'Content-Type: application/json' http://localhost:8080/topjava/ajax/admin/users/100000?enabled=false --user admin@gmail.com:admin`
+
+#### get All Users  (ajax)
+`curl -s http://localhost:8080/topjava/ajax/admin/users --user admin@gmail.com:admin`
+
+
+

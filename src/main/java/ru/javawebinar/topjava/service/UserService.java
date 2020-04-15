@@ -8,6 +8,7 @@ import org.springframework.util.Assert;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFound;
@@ -56,5 +57,13 @@ public class UserService {
 
     public User getWithMeals(int id) {
         return checkNotFoundWithId(repository.getWithMeals(id), id);
+    }
+
+    @CacheEvict(value = "users", allEntries = true)
+    @Transactional
+    public void changeEnable(int id, boolean enabled) {
+        User user = get(id);
+        user.setEnabled(enabled);
+        update(user);
     }
 }

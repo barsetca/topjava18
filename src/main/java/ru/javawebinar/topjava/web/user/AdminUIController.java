@@ -13,6 +13,13 @@ import java.util.List;
 public class AdminUIController extends AbstractUserController {
 
     @Override
+    @PostMapping("/{id}")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void changeEnable(@PathVariable("id") int id, @RequestParam("enabled") boolean enabled) {
+        super.changeEnable(id, enabled);
+    }
+
+    @Override
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<User> getAll() {
         return super.getAll();
