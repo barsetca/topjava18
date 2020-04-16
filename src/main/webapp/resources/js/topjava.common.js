@@ -27,21 +27,13 @@ function deleteRow(id) {
         url: context.ajaxUrl + id,
         type: "DELETE"
     }).done(function () {
-        updateTable();
         successNoty("Deleted");
+        context.updateTable();
     });
 }
 
 function updateTableFromFilter(data) {
-    //$.get(context.ajaxUrl, function (data) {
     context.datatableApi.clear().rows.add(data).draw();
-    //});
-}
-
-function updateTable() {
-    $.get(context.ajaxUrl, function (data) {
-        context.datatableApi.clear().rows.add(data).draw();
-    });
 }
 
 function save() {
@@ -51,7 +43,8 @@ function save() {
         data: form.serialize()
     }).done(function () {
         $("#editRow").modal("hide");
-        updateTable();
+        //filter();
+        context.updateTable();
         successNoty("Saved");
     });
 }

@@ -1,7 +1,12 @@
 // $(document).ready(function () {
+
+var ajaxUrl = "ajax/admin/users/";
 $(function () {
     makeEditable({
-            ajaxUrl: "ajax/admin/users/",
+            updateTable: function () {
+                $.get(ajaxUrl, updateTableFromFilter);
+            },
+            ajaxUrl: ajaxUrl,
             datatableApi: $("#datatable").DataTable({
                 "paging": false,
                 "info": true,
@@ -40,25 +45,23 @@ $(function () {
         }
     );
 
-    $(".custom-checkbox").each(function () {
-        if ($(this).is(":checked")) {
-            $(this).parent().parent().css("color", "green");
-        } else {
-            $(this).parent().parent().css("color", "red");
-        }
-    })
+    // $(".custom-checkbox").each(function () {
+    //     if ($(this).is(":checked")) {
+    //         $(this).parent().parent().css("color", "green");
+    //     } else {
+    //         $(this).parent().parent().css("color", "red");
+    //     }
+    // })
 });
 
 function changeEnable(checkBox) {
     const enabled = checkBox.is(":checked");
     $.ajax({
-        url: context.ajaxUrl + checkBox.attr("id"),
+        url: ajaxUrl + checkBox.attr("id"),
         type: "POST",
         data: "enabled=" + enabled
     }).done(function () {
-        $.get(context.ajaxUrl, function () {
-            updateTable();
-            successNoty("Change enable");
-        })
+        successNoty(enabled ? "Enabled" : "Disabled");
+        context.updateTable();
     });
 }

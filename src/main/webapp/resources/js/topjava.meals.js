@@ -11,6 +11,7 @@ function filter() {
 
 $(function () {
     makeEditable({
+        updateTable: filter,
         ajaxUrl: "ajax/profile/meals/",
         datatableApi: $("#datatable").DataTable({
             "paging": false,
@@ -40,6 +41,8 @@ $(function () {
                     "desc"
                 ]
             ]
-        }),
+        })
+
     });
 });
+
