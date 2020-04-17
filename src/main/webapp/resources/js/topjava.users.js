@@ -62,6 +62,6 @@ function changeEnable(checkBox) {
         data: "enabled=" + enabled
     }).done(function () {
         successNoty(enabled ? "Enabled" : "Disabled");
-        context.updateTable();
+       // context.updateTable();
     });
 }
