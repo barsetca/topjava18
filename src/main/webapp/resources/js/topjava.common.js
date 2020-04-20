@@ -21,7 +21,14 @@ function updateRow(id) {
     $("#modalTitle").html(i18n["editTitle"]);
     $.get(context.ajaxUrl + id, function (data) {
         $.each(data, function (key, value) {
-            form.find("input[name='" + key + "']").val(value);
+            form.find("input[name='" + key + "']").val(function () {
+                if (key === "dateTime") {
+                    return value.replace("T", " ").substring(0, 16);
+                } else {
+                    return value;
+                }
+
+            });
         });
         $('#editRow').modal();
     });
