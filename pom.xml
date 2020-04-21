@@ -1,3 +1,4 @@
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -16,31 +17,32 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <spring.version>5.2.1.RELEASE</spring.version>
-        <spring-data-jpa.version>2.2.0.RELEASE</spring-data-jpa.version>
-        <jackson-json.version>2.10.1</jackson-json.version>
-        <tomcat.version>9.0.27</tomcat.version>
+        <spring.version>5.2.5.RELEASE</spring.version>
+        <spring.security.version>5.3.1.RELEASE</spring.security.version>
+        <spring-data-jpa.version>2.2.6.RELEASE</spring-data-jpa.version>
+        <jackson-json.version>2.10.3</jackson-json.version>
+        <tomcat.version>9.0.31</tomcat.version>
 
         <!-- Logging -->
         <logback.version>1.2.3</logback.version>
-        <slf4j.version>1.7.28</slf4j.version>
+        <slf4j.version>1.7.30</slf4j.version>
 
         <!--DB-->
-        <postgresql.version>42.2.8</postgresql.version>
+        <postgresql.version>42.2.10</postgresql.version>
         <!--    Tests  -->
-        <junit.jupiter.version>5.5.2</junit.jupiter.version>
+        <junit.jupiter.version>5.6.1</junit.jupiter.version>
         <hamcrest.version>1.3</hamcrest.version>
 
         <!-- Hibernate -->
-        <hibernate.version>5.4.7.Final</hibernate.version>
-        <hibernate-validator.version>6.0.17.Final</hibernate-validator.version>
+        <hibernate.version>5.4.12.Final</hibernate.version>
+        <hibernate-validator.version>6.1.2.Final</hibernate-validator.version>
         <javax-el.version>3.0.1-b11</javax-el.version>
 
         <!--Tools-->
         <ehcache.version>3.8.1</ehcache.version>
 
         <!--webjars-->
-        <webjars-bootstrap.version>4.4.0</webjars-bootstrap.version>
+        <webjars-bootstrap.version>4.4.1</webjars-bootstrap.version>
         <webjars-jquery.version>3.4.1</webjars-jquery.version>
         <webjars-datetimepicker.version>2.5.20</webjars-datetimepicker.version>
         <webjars-noty.version>3.1.4</webjars-noty.version>
@@ -75,7 +77,7 @@
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
-                <version>1.7.7</version>
+                <version>1.7.10</version>
                 <configuration>
                     <container>
                         <containerId>tomcat9x</containerId>
@@ -95,7 +97,7 @@
                             <configfile>
                                 <file>src/main/resources/tomcat/context.xml</file>
                                 <todir>conf/Catalina/localhost/</todir>
-                                <tofile>context.xml.default</tofile>
+                                <tofile>${project.build.finalName}.xml</tofile>
                             </configfile>
                         </configfiles>
                     </configuration>
@@ -151,12 +153,17 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
-            <version>${spring.version}</version>
+            <version>${spring.security.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-config</artifactId>
-            <version>${spring.version}</version>
+            <version>${spring.security.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-taglibs</artifactId>
+            <version>${spring.security.version}</version>
         </dependency>
 
         <!--- ORM -->
@@ -312,14 +319,14 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
-            <version>${spring.version}</version>
+            <version>${spring.security.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.13.2</version>
+            <version>3.15.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
