@@ -58,7 +58,7 @@ public class MealTo extends BaseTo {
 
     @Override
     public String toString() {
-        return "UserMealWithExcess{" +
+        return "MealTo{" +
                 "id=" + id +
                 ", dateTime=" + dateTime +
                 ", description='" + description + '\'' +
