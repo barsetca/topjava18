@@ -35,7 +35,7 @@ class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     void get() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get(REST_URL + MEAL1_ID)
+       perform(MockMvcRequestBuilders.get(REST_URL + MEAL1_ID)
                 .with(userHttpBasic(USER)))
                 .andExpect(status().isOk())
                 .andDo(print())
@@ -44,13 +44,13 @@ class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     void getUnauth() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get(REST_URL + MEAL1_ID))
+       perform(MockMvcRequestBuilders.get(REST_URL + MEAL1_ID))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     void delete() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete(REST_URL + MEAL1_ID)
+       perform(MockMvcRequestBuilders.delete(REST_URL + MEAL1_ID)
                 .with(userHttpBasic(USER)))
                 .andExpect(status().isNoContent());
         assertThrows(NotFoundException.class, () -> mealService.get(MEAL1_ID, USER_ID));
@@ -60,18 +60,18 @@ class MealRestControllerTest extends AbstractControllerTest {
     void update() throws Exception {
         Meal updated = MealTestData.getUpdated();
 
-        mockMvc.perform(MockMvcRequestBuilders.put(REST_URL + MEAL1_ID).contentType(MediaType.APPLICATION_JSON)
+       perform(MockMvcRequestBuilders.put(REST_URL + MEAL1_ID).contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(updated))
                 .with(userHttpBasic(USER)))
                 .andExpect(status().isNoContent());
 
-        assertMatch(mealService.get(MEAL1_ID, START_SEQ), updated);
+        MEAL_MATCHER.assertMatch(mealService.get(MEAL1_ID, START_SEQ), updated);
     }
 
     @Test
     void createWithLocation() throws Exception {
         Meal newMeal = MealTestData.getNew();
-        ResultActions action = mockMvc.perform(MockMvcRequestBuilders.post(REST_URL)
+        ResultActions action =perform(MockMvcRequestBuilders.post(REST_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(newMeal))
                 .with(userHttpBasic(USER)));
@@ -79,36 +79,36 @@ class MealRestControllerTest extends AbstractControllerTest {
         Meal created = readFromJson(action, Meal.class);
         Integer newId = created.getId();
         newMeal.setId(newId);
-        assertMatch(created, newMeal);
-        assertMatch(mealService.get(newId, USER_ID), newMeal);
+        MEAL_MATCHER.assertMatch(created, newMeal);
+        MEAL_MATCHER.assertMatch(mealService.get(newId, USER_ID), newMeal);
     }
 
     @Test
     void getAll() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get(REST_URL)
+       perform(MockMvcRequestBuilders.get(REST_URL)
                 .with(userHttpBasic(USER)))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(contentJson(getTos(MEALS, USER.getCaloriesPerDay())));
+                .andExpect(MEAL_TO_MATCHER.contentJson(getTos(MEALS, USER.getCaloriesPerDay())));
     }
 
     @Test
     void filter() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get(REST_URL + "filter")
+       perform(MockMvcRequestBuilders.get(REST_URL + "filter")
                 .param("startDate", "2015-05-30").param("startTime", "07:00")
                 .param("endDate", "2015-05-31").param("endTime", "11:00")
                 .with(userHttpBasic(USER)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andExpect(contentJson(createTo(MEAL5, true), createTo(MEAL1, false)));
+                .andExpect(MEAL_TO_MATCHER.contentJson(createTo(MEAL5, true), createTo(MEAL1, false)));
     }
 
     @Test
     void filterAll() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get(REST_URL + "filter?startDate=&endTime=")
+       perform(MockMvcRequestBuilders.get(REST_URL + "filter?startDate=&endTime=")
                 .with(userHttpBasic(USER)))
                 .andExpect(status().isOk())
-                .andExpect(contentJson(getTos(MEALS, USER.getCaloriesPerDay())));
+                .andExpect(MEAL_TO_MATCHER.contentJson(getTos(MEALS, USER.getCaloriesPerDay())));
     }
 }

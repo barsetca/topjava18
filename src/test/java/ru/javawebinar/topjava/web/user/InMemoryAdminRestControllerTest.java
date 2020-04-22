@@ -1,9 +1,7 @@
+
 package ru.javawebinar.topjava.web.user;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -13,7 +11,6 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
 
 class InMemoryAdminRestControllerTest {
@@ -21,12 +18,14 @@ class InMemoryAdminRestControllerTest {
 
     private static ConfigurableApplicationContext appCtx;
     private static AdminRestController controller;
+    private static InMemoryUserRepository repository;
 
     @BeforeAll
     static void beforeClass() {
-        appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml", "spring/inmemory.xml");
+        appCtx = new ClassPathXmlApplicationContext("spring/inmemory.xml");
         log.info("\n{}\n", Arrays.toString(appCtx.getBeanDefinitionNames()));
-        controller = appCtx.getBean(AdminRestController.class);
+        //controller = appCtx.getBean(AdminRestController.class);
+        repository = appCtx.getBean(InMemoryUserRepository.class);
     }
 
     @AfterAll
@@ -39,18 +38,17 @@ class InMemoryAdminRestControllerTest {
     @BeforeEach
     void setUp() throws Exception {
         // re-initialize
-        InMemoryUserRepository repository = appCtx.getBean(InMemoryUserRepository.class);
         repository.init();
     }
 
     @Test
     void delete() throws Exception {
         controller.delete(USER_ID);
-        assertThrows(NotFoundException.class, () -> controller.get(USER_ID));
+        Assertions.assertNull(repository.get(USER_ID));
     }
 
     @Test
     void deleteNotFound() throws Exception {
-        assertThrows(NotFoundException.class, () -> controller.delete(10));
+        Assertions.assertThrows(NotFoundException.class, () -> controller.delete(10));
     }
 }

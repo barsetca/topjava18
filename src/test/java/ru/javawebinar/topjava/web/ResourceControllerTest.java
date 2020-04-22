@@ -1,3 +1,4 @@
+
 package ru.javawebinar.topjava.web;
 
 import org.junit.jupiter.api.Test;
@@ -11,8 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ResourceControllerTest extends AbstractControllerTest {
 
     @Test
-    void testResources() throws Exception {
-        mockMvc.perform(get("/resources/css/style.css"))
+    void resources() throws Exception {
+        perform(get("/resources/css/style.css"))
                 .andDo(print())
                 .andExpect(content().contentType(MediaType.valueOf("text/css")))
                 .andExpect(status().isOk());

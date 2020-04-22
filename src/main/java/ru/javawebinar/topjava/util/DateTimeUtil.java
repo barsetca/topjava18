@@ -32,11 +32,11 @@ public class DateTimeUtil {
         return StringUtils.isEmpty(str) ? null : LocalTime.parse(str);
     }
 
-    public static LocalDateTime getStartInclusive(LocalDate localDate) {
+    public static LocalDateTime atStartOfDayOrMin(LocalDate localDate) {
         return localDate != null ? localDate.atStartOfDay() : MIN_DATE;
     }
 
-    public static LocalDateTime getEndExclusive(LocalDate localDate) {
+    public static LocalDateTime atStartOfNextDayOrMax(LocalDate localDate) {
         return localDate != null ? localDate.plus(1, ChronoUnit.DAYS).atStartOfDay() : MAX_DATE;
     }
 }

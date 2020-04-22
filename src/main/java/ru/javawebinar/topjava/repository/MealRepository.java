@@ -8,8 +8,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static ru.javawebinar.topjava.util.DateTimeUtil.getEndExclusive;
-import static ru.javawebinar.topjava.util.DateTimeUtil.getStartInclusive;
+import static ru.javawebinar.topjava.util.DateTimeUtil.atStartOfNextDayOrMax;
+import static ru.javawebinar.topjava.util.DateTimeUtil.atStartOfDayOrMin;
 
 public interface MealRepository {
     // null if updated meal do not belong to userId
@@ -26,7 +26,7 @@ public interface MealRepository {
 
     // ORDERED dateTime desc
     default List<Meal> getBetweenInclusive(@Nullable LocalDate startDate, @Nullable LocalDate endDate, int userId) {
-        return getBetweenInclusive(getStartInclusive(startDate), getEndExclusive(endDate), userId);
+        return getBetweenInclusive(atStartOfDayOrMin(startDate), atStartOfNextDayOrMax(endDate), userId);
     }
 
     // ORDERED dateTime desc
