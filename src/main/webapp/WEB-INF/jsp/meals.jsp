@@ -1,9 +1,13 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%--<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>--%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="fn" uri="http://topjava.javawebinar.ru/functions" %>
+<%@ taglib prefix="topjava" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+
 <html>
 <jsp:include page="fragments/headTag.jsp"/>
+
 <body>
 <script type="text/javascript" src="resources/js/topjava.common.js" defer></script>
 <script type="text/javascript" src="resources/js/topjava.meals.js" defer></script>

@@ -1,10 +1,8 @@
-<%@page contentType="text/html" pageEncoding="UTF-8" %>
+<%--<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>--%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
     <meta name="_csrf" content="${_csrf.token}"/>
     <meta name="_csrf_header" content="${_csrf.headerName}"/>
 
@@ -25,5 +23,6 @@
     <script type="text/javascript" src="webjars/datatables/1.10.20/js/jquery.dataTables.min.js" defer></script>
     <script type="text/javascript" src="webjars/datatables/1.10.20/js/dataTables.bootstrap4.min.js" defer></script>
     <script type="text/javascript" src="webjars/noty/3.1.4/lib/noty.min.js" defer></script>
-    <script type="text/javascript" src="webjars/datetimepicker/2.5.20/build/jquery.datetimepicker.full.min.js" defer></script>
+    <script type="text/javascript" src="webjars/datetimepicker/2.5.20/build/jquery.datetimepicker.full.min.js"
+            defer></script>
 </head>

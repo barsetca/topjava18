@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.UserService;
 import ru.javawebinar.topjava.to.UserTo;
@@ -65,9 +67,35 @@ class ProfileRestControllerTest extends AbstractControllerTest {
         USER_MATCHER.assertMatch(userService.get(newId), newUser);
     }
 
+    @Transactional(propagation = Propagation.NEVER)
+    @Test
+    void duplicateMailRegister() throws Exception {
+        UserTo newTo = new UserTo(null, "newName", "admin@gmail.com", "newPassword", 1500);
+        User newUser = UserUtil.createNewFromTo(newTo);
+        ResultActions action = perform(MockMvcRequestBuilders.post(REST_URL + "/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(newTo)))
+                .andDo(print())
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void registerValidationError() throws Exception {
+        UserTo newTo = new UserTo(null, "newName", "newemail@ya.ru", "newPassword", 1500);
+        newTo.setCaloriesPerDay(5);
+//        newTo.setEmail("u");
+//        newTo.setName("");
+//        newTo.setName("u");
+        ResultActions action = perform(MockMvcRequestBuilders.post(REST_URL + "/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(newTo)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+    }
+
     @Test
     void update() throws Exception {
-        UserTo updatedTo = new UserTo(null, "newName", "newemail@ya.ru", "newPassword", 1500);
+        UserTo updatedTo = new UserTo(null, "newName", "admin@gmail.com", "newPassword", 1500);
         perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(USER))
                 .content(JsonUtil.writeValue(updatedTo)))
@@ -75,5 +103,30 @@ class ProfileRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isNoContent());
 
         USER_MATCHER.assertMatch(userService.get(USER_ID), UserUtil.updateFromTo(new User(USER), updatedTo));
+    }
+
+    @Transactional(propagation = Propagation.NEVER)
+    @Test
+    void duplicateMailUpdate() throws Exception {
+        UserTo updatedTo = new UserTo(null, "newName", "admin@gmail.com", "newPassword", 1500);
+        perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(USER))
+                .content(JsonUtil.writeValue(updatedTo)))
+                .andDo(print())
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void updateValidationError() throws Exception {
+        UserTo updatedTo = new UserTo(null, "newName", "user@gmail.com", "newPassword", 1500);
+        updatedTo.setCaloriesPerDay(5);
+//        updatedTo.setEmail("u");
+//        updatedTo.setName("");
+//        updatedTo.setName("u");
+        perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(USER))
+                .content(JsonUtil.writeValue(updatedTo)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
     }
 }

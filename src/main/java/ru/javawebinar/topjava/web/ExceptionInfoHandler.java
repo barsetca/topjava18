@@ -7,6 +7,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,12 +42,19 @@ public class ExceptionInfoHandler {
     }
 
     @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)  // 422
-    @ExceptionHandler({IllegalRequestDataException.class, MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class})
+    @ExceptionHandler({IllegalRequestDataException.class, MethodArgumentTypeMismatchException.class, IllegalArgumentException.class,
+            HttpMessageNotReadableException.class})
     public ErrorInfo illegalRequestDataError(HttpServletRequest req, Exception e) {
         return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR);
     }
 
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)  // 422
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ErrorInfo illegalRequestRestDataError(HttpServletRequest req, Exception e) {
+        return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR);
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) // 500
     @ExceptionHandler(Exception.class)
     public ErrorInfo handleError(HttpServletRequest req, Exception e) {
         return logAndGetErrorInfo(req, e, true, APP_ERROR);

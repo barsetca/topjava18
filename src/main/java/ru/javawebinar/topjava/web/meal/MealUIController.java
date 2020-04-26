@@ -1,11 +1,13 @@
 package ru.javawebinar.topjava.web.meal;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.support.SessionStatus;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.ValidationUtil;
@@ -38,18 +40,23 @@ public class MealUIController extends AbstractMealController {
         super.delete(id);
     }
 
-    @PostMapping
-    public ResponseEntity<String> createOrUpdate(@Valid Meal meal, BindingResult result) {
+    @PostMapping()
+    public void createOrUpdate(@Valid Meal meal, BindingResult result, SessionStatus status, ModelMap model) {
         if (result.hasErrors()) {
-            // TODO change to exception handler
-            return ValidationUtil.getErrorResponse(result);
+            // TODO change to exception handlers
+            ValidationUtil.throwIllegalArgumentException(result);
+            return;
         }
-        if (meal.isNew()) {
-            super.create(meal);
-        } else {
-            super.update(meal, meal.getId());
+        try {
+            if (meal.isNew()) {
+                super.create(meal);
+            } else {
+                super.update(meal, meal.getId());
+            }
+        } catch (
+                DataIntegrityViolationException e) {
+            throw new DataIntegrityViolationException("Meal with this date and time already exists");
         }
-        return ResponseEntity.ok().build();
     }
 
     @Override

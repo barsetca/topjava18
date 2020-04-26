@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.UserService;
@@ -93,12 +95,35 @@ class AdminRestControllerTest extends AbstractControllerTest {
         perform(MockMvcRequestBuilders.put(REST_URL + USER_ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(ADMIN))
-                .content(JsonUtil.writeValue(updated)))
+                .content(UserTestData.jsonWithPassword(updated, "password")))
                 .andExpect(status().isNoContent());
-
         USER_MATCHER.assertMatch(userService.get(USER_ID), updated);
     }
 
+    @Transactional(propagation = Propagation.NEVER)
+    @Test
+    void duplicateMailUpdate() throws Exception {
+        User updated = UserTestData.getUpdated();
+        updated.setEmail("admin@gmail.com");
+        perform(MockMvcRequestBuilders.put(REST_URL + USER_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(ADMIN))
+                .content(UserTestData.jsonWithPassword(updated, "password")))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void updateValidationError() throws Exception {
+        User updated = UserTestData.getUpdated();
+        updated.setCaloriesPerDay(0);
+        perform(MockMvcRequestBuilders.put(REST_URL + USER_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(ADMIN))
+                .content(JsonUtil.writeValue(updated)))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Transactional(propagation = Propagation.NEVER)
     @Test
     void createWithLocation() throws Exception {
         User newUser = UserTestData.getNew();
@@ -113,6 +138,32 @@ class AdminRestControllerTest extends AbstractControllerTest {
         newUser.setId(newId);
         USER_MATCHER.assertMatch(created, newUser);
         USER_MATCHER.assertMatch(userService.get(newId), newUser);
+    }
+
+    @Transactional(propagation = Propagation.NEVER)
+    @Test
+    void duplicateMailCreate() throws Exception {
+        User newUser = UserTestData.getNew();
+        newUser.setEmail("admin@gmail.com");
+        ResultActions action = perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(ADMIN))
+                .content(UserTestData.jsonWithPassword(newUser, "newPass")))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void createWithLocationValidationError() throws Exception {
+        User newUser = UserTestData.getNew();
+        newUser.setCaloriesPerDay(0);
+//        newUser.setCaloriesPerDay(1);
+//        newUser.setEmail("");
+//        newUser.setEmail("a");
+        ResultActions action = perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(ADMIN))
+                .content(UserTestData.jsonWithPassword(newUser, "newPass")))
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
