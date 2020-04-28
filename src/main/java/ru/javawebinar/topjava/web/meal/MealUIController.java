@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.web.meal;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
@@ -10,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.to.MealTo;
-import ru.javawebinar.topjava.util.ValidationUtil;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -41,21 +39,11 @@ public class MealUIController extends AbstractMealController {
     }
 
     @PostMapping()
-    public void createOrUpdate(@Valid Meal meal, BindingResult result, SessionStatus status, ModelMap model) {
-        if (result.hasErrors()) {
-            // TODO change to exception handlers
-            ValidationUtil.throwIllegalArgumentException(result);
-            return;
-        }
-        try {
-            if (meal.isNew()) {
-                super.create(meal);
-            } else {
-                super.update(meal, meal.getId());
-            }
-        } catch (
-                DataIntegrityViolationException e) {
-            throw new DataIntegrityViolationException("Meal with this date and time already exists");
+    public void createOrUpdate(@Valid Meal meal) {
+        if (meal.isNew()) {
+            super.create(meal);
+        } else {
+            super.update(meal, meal.getId());
         }
     }
 

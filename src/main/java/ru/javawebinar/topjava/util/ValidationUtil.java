@@ -1,16 +1,11 @@
 package ru.javawebinar.topjava.util;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import ru.javawebinar.topjava.HasId;
 import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.validation.*;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ValidationUtil {
 
@@ -78,24 +73,5 @@ public class ValidationUtil {
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
         }
-    }
-
-    public static ResponseEntity<String> getErrorResponse(BindingResult result) {
-        return ResponseEntity.unprocessableEntity().body(
-                result.getFieldErrors().stream()
-                        .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
-                        .collect(Collectors.joining("<br>"))
-        );
-    }
-
-    public static void throwIllegalArgumentException(BindingResult result) {
-        List<FieldError> fe = result.getFieldErrors();
-        StringBuilder sb = new StringBuilder("<br/>");
-        for (FieldError fieldError : fe) {
-            sb.append(fieldError.getField()).append(" - ");
-            sb.append(fieldError.getDefaultMessage()).append("<br/>");
-
-        }
-        throw new IllegalArgumentException(sb.toString());
     }
 }
