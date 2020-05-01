@@ -53,6 +53,7 @@
     </div>
 </div>
 <div class="container lead"><spring:message code="app.description"/>
+    <a href="https://github.com/JavaOPs/topjava">Java Enterprise проект</a> с регистрацией/авторизацией и правами доступа на основе ролей (USER, ADMIN). Администратор может создавать/редактировать/удалять пользователей, а пользователи - управлять своим профилем и данными (едой) через UI (по AJAX) и по REST интерфейсу с базовой авторизацией. Возможна фильтрация еды по датам и времени. Цвет записи таблицы еды зависит от того, превышает ли сумма калорий за день норму (редактируемый параметр в профиле пользователя). Весь REST интерфейс покрывается JUnit тестами, используя Spring MVC Test и Spring Security Test.
 </div>
 <jsp:include page="fragments/footer.jsp"/>
 <script type="text/javascript">
