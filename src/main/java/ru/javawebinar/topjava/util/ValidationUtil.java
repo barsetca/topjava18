@@ -91,4 +91,21 @@ public class ValidationUtil {
             throw new ConstraintViolationException(violations);
         }
     }
+    /*
+        /*
+     public static ResponseEntity<String> getStringResponseEntityError(BindingResult result) {
+        StringJoiner joiner = new StringJoiner("<br>");
+        result.getFieldErrors().forEach(
+                fe -> {
+                    String msg = fe.getDefaultMessage();
+                    if (msg != null) {
+                        if (!msg.startsWith(fe.getField())) {
+                            msg = fe.getField() + ' ' + msg;
+                        }
+                        joiner.add(msg);
+                    }
+                });
+        return ResponseEntity.unprocessableEntity().body(joiner.toString());
+     */
+     */
 }
